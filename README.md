@@ -30,10 +30,10 @@ sudo apt install python3-pyelftools python3-requests libcapstone4 libicu74
 Get the `tar.gz` matching your Dart version from the [latest Release](../../releases/latest):
 
 ```
-tar -xzf blutter-linux-x64-dart3.8.1-android-arm64-v1.0.0.tar.gz
-mkdir -p input/arm64-v8a out
-# put libapp.so + libflutter.so into input/arm64-v8a/
-python3 blutter.py input/arm64-v8a out
+tar -xzf blutter-linux-x64-dart<version>-<os>-<arch>-<tag>.tar.gz
+mkdir -p input/<arch> out
+# put libapp.so + libflutter.so into input/<arch>/
+python3 blutter.py input/<arch> out
 ```
 
 Needs only Python 3 plus the Capstone/ICU runtime libs. Results go to `out/`.
