@@ -19,6 +19,12 @@ The blutter.py will automatically detect the Dart version from the flutter engin
 
 If the blutter executable for required Dart version does not exists, the script will automatically checkout Dart source code and compiling it.
 
+## Dependencies (prebuilt use)
+
+```
+sudo apt install python3-pyelftools python3-requests libcapstone4 libicu74
+```
+
 ## Prebuilt Linux Release (no build needed)
 
 Get the `tar.gz` matching your Dart version from the [latest Release](../../releases/latest):
