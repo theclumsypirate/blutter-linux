@@ -93,6 +93,7 @@ jobs:
           mkdir -p dist stage
           cp blutter.py dartvm_fetch_build.py extract_dart_info.py LICENSE README.md stage/
           cp -r scripts stage/
+          cp -r blutter stage/
           mkdir -p stage/bin
           cp "$BIN" stage/bin/
           mkdir -p stage/packages
