@@ -1,0 +1,114 @@
+name: build-linux
+
+# DOAR manual. Fara push, fara pull_request, fara branches.
+"on":
+  workflow_dispatch:
+    inputs:
+      dart_version:
+        description: "Dart version (ex: 3.8.1)"
+        required: true
+        default: "3.8.1"
+        type: string
+      target_os:
+        description: "Target OS"
+        required: true
+        default: "android"
+        type: choice
+        options:
+          - android
+          - ios
+      target_arch:
+        description: "Target arch"
+        required: true
+        default: "arm64"
+        type: choice
+        options:
+          - arm64
+          - x64
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout (cu tags)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Deps sistem (README Debian)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pyelftools python3-requests git cmake ninja-build \
+            build-essential pkg-config libicu-dev libcapstone-dev
+          gcc --version | head -n 1
+          cmake --version | head -n 1
+
+      - name: Tag incremental automat (patch+1)
+        id: tag
+        run: |
+          git fetch --tags --force
+          LATEST=$(git tag -l 'v[0-9]*.[0-9]*.[0-9]*' | sort -V | tail -n 1)
+          if [ -z "$LATEST" ]; then
+            NEXT="v1.0.0"
+          else
+            VER=${LATEST#v}
+            MAJOR=$(echo "$VER" | cut -d. -f1)
+            MINOR=$(echo "$VER" | cut -d. -f2)
+            PATCH=$(echo "$VER" | cut -d. -f3)
+            NEXT="v${MAJOR}.${MINOR}.$((PATCH + 1))"
+          fi
+          echo "latest=$LATEST next=$NEXT"
+          echo "next_tag=$NEXT" >> "$GITHUB_OUTPUT"
+
+      - name: Build dartvm lib + blutter (Linux x64)
+        run: |
+          python3 dartvm_fetch_build.py "${{ inputs.dart_version }}" "${{ inputs.target_os }}" "${{ inputs.target_arch }}"
+          python3 - <<'PY'
+          import os
+          from dartvm_fetch_build import DartLibInfo, fetch_and_build
+          from blutter import BlutterInput, cmake_blutter
+          ver = os.environ["DART_VERSION"]
+          os_name = os.environ["TARGET_OS"]
+          arch = os.environ["TARGET_ARCH"]
+          info = DartLibInfo(ver, os_name, arch)
+          fetch_and_build(info)  # no-op daca lib exista deja
+          inp = BlutterInput("", info, "out", True, False, False)
+          cmake_blutter(inp)
+          assert os.path.isfile(inp.blutter_file), "lipsa binar: " + inp.blutter_file
+          print("BINAR:", inp.blutter_file)
+          PY
+        env:
+          DART_VERSION: ${{ inputs.dart_version }}
+          TARGET_OS: ${{ inputs.target_os }}
+          TARGET_ARCH: ${{ inputs.target_arch }}
+
+      - name: Pack tar.gz (bin + runtime, fara dartsdk/build)
+        run: |
+          BIN=$(ls bin/blutter_dartvm${{ inputs.dart_version }}_${{ inputs.target_os }}_${{ inputs.target_arch }}* | head -n 1)
+          echo "binar: $BIN"
+          mkdir -p dist stage
+          cp blutter.py dartvm_fetch_build.py extract_dart_info.py LICENSE README.md stage/
+          cp -r scripts stage/
+          mkdir -p stage/bin
+          cp "$BIN" stage/bin/
+          mkdir -p stage/packages
+          cp -r packages/lib stage/packages/
+          cp -r packages/include stage/packages/
+          NAME="blutter-linux-x64-dart${{ inputs.dart_version }}-${{ inputs.target_os }}-${{ inputs.target_arch }}-${{ steps.tag.outputs.next_tag }}"
+          tar -czf "dist/${NAME}.tar.gz" -C stage .
+          ls -la dist/
+
+      - name: Tag + GitHub Release (atasat tar.gz, fara upload-artifact)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ steps.tag.outputs.next_tag }}"
+          git tag "$TAG"
+          git push origin "$TAG"
+          gh release create "$TAG" dist/*.tar.gz \
+            --title "blutter linux $TAG (dart ${{ inputs.dart_version }} ${{ inputs.target_os }} ${{ inputs.target_arch }})" \
+            --notes "Build Linux x64 automat (manual dispatch). Dart ${{ inputs.dart_version }} / ${{ inputs.target_os }} / ${{ inputs.target_arch }}. Despacheteaza tar.gz si ruleaza: python3 blutter.py <dir-cu-libapp+libflutter> <out>"
