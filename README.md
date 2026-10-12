@@ -1,4 +1,4 @@
-# B(l)utter
+# Blutter on Linux
 Flutter Mobile Application Reverse Engineering Tool by Compiling Dart AOT Runtime
 
 Currently the application supports only Android libapp.so (arm64 only).
