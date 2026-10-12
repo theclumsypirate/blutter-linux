@@ -12,42 +12,6 @@ This application uses C++20 Formatting library. It requires very recent C++ comp
 
 I recommend using Linux OS (only tested on Deiban sid/trixie) because it is easy to setup.
 
-### Debian Unstable (gcc 13)
-**_NOTE:_**
-Use ONLY Debian/Ubuntu version that provides gcc>=13 from its own main repository.
-Using ported gcc to old Debian/Ubuntu version does not work.
-
-- Install build tools and depenencies
-```
-apt install python3-pyelftools python3-requests git cmake ninja-build \
-    build-essential pkg-config libicu-dev libcapstone-dev
-```
-
-### Windows
-- Install git and python 3
-- Install latest Visual Studio with "Desktop development with C++" and "C++ CMake tools"
-- Install required libraries (libcapstone and libicu4c)
-```
-python scripts\init_env_win.py
-```
-- Start "x64 Native Tools Command Prompt"
-
-### macOS Sequoia
-- Install XCode
-- Install required tools
-```
-brew install cmake ninja pkg-config icu4c capstone
-pip3 install pyelftools requests
-```
-
-### macOS Ventura and Sonoma (clang 16)
-- Install XCode
-- Install clang 16 and required tools
-```
-brew install llvm@16 cmake ninja pkg-config icu4c capstone
-pip3 install pyelftools requests
-```
-
 ## Usage
 Extract "lib" directory from apk file
 ```
