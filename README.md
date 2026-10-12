@@ -57,6 +57,31 @@ The blutter.py will automatically detect the Dart version from the flutter engin
 
 If the blutter executable for required Dart version does not exists, the script will automatically checkout Dart source code and compiling it.
 
+## Prebuilt Linux Release (no build needed)
+Prebuilt `tar.gz` archives are published on the [Releases](../../releases) page by the
+`build-linux` workflow (manual dispatch only, auto-incremented tag such as `v1.0.0`).
+The archive name encodes the Dart version, target OS and architecture:
+
+```
+blutter-linux-x64-dart<dart_version>-<target_os>-<target_arch>-<tag>.tar.gz
+```
+
+Pick the archive that matches the Dart version of your `libapp.so`
+(use `python3 extract_dart_info.py` or check the workflow run summary if unsure).
+No compiler is needed, only a Python 3 interpreter and the Capstone/ICU
+runtime libraries (same packages as in Environment Setup, minus the build tools).
+
+```
+tar -xzf blutter-linux-x64-dart3.8.1-android-arm64-v1.0.0.tar.gz
+mkdir -p input/arm64-v8a out
+# put libapp.so + libflutter.so into input/arm64-v8a/
+python3 blutter.py input/arm64-v8a out
+```
+
+The `bin/` directory already contains the prebuilt `blutter_dartvm*` executable
+for that Dart version, so the analysis starts immediately without compiling.
+Results (classes, functions, assemblies) are written to `out/`.
+
 ## Update
 You can use ```git pull``` to update and run blutter.py with ```--rebuild``` option to force rebuild the executable
 ```
