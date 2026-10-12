@@ -46,12 +46,6 @@ The `bin/` directory already contains the prebuilt `blutter_dartvm*` executable
 for that Dart version, so the analysis starts immediately without compiling.
 Results (classes, functions, assemblies) are written to `out/`.
 
-## Update
-You can use ```git pull``` to update and run blutter.py with ```--rebuild``` option to force rebuild the executable
-```
-python3 blutter.py path/to/app/lib/arm64-v8a out_dir --rebuild
-```
-
 ## Output files
 - **asm/\*** libapp assemblies with symbols
 - **blutter_frida.js** the frida script template for the target application
