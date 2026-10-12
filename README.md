@@ -58,7 +58,7 @@ The blutter.py will automatically detect the Dart version from the flutter engin
 If the blutter executable for required Dart version does not exists, the script will automatically checkout Dart source code and compiling it.
 
 ## Prebuilt Linux Release (no build needed)
-Prebuilt `tar.gz` archives are published on the [Releases](../../releases) page by the
+Prebuilt `tar.gz` archives are published on the [latest Release](../../releases/latest) page by the
 `build-linux` workflow (manual dispatch only, auto-incremented tag such as `v1.0.0`).
 The archive name encodes the Dart version, target OS and architecture:
 
