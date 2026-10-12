@@ -4,8 +4,6 @@ Flutter Mobile Application Reverse Engineering Tool by Compiling Dart AOT Runtim
 Currently the application supports only Android libapp.so (arm64 only).
 Also the application is currently work only against recent Dart versions.
 
-For high priority missing features, see [TODO](#todo)
-
 
 ## Environment Setup
 This application uses C++20 Formatting library. It requires very recent C++ compiler such as g++>=13, Clang>=16.
@@ -61,21 +59,3 @@ Results (classes, functions, assemblies) are written to `out/`.
 - **external** contains 3rd party libraries for Windows only
 - **packages** contains the static libraries of Dart Runtime
 - **scripts** contains python scripts for getting/building Dart
-
-
-## Generating Visual Studio Solution for Development
-I use Visual Studio to delevlop Blutter on Windows. ```--vs-sln``` options can be used to generate a Visual Studio solution.
-```
-python blutter.py path\to\lib\arm64-v8a build\vs --vs-sln
-```
-
-## TODO
-- More code analysis
-  - Function arguments and return type
-  - Some psuedo code for code pattern
-- Generate better Frida script
-  - More internal classes
-  - Object modification
-- Obfuscated app (still missing many functions)
-- Reading iOS binary
-- Input as apk or ipa
