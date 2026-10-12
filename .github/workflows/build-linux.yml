@@ -1,6 +1,6 @@
 name: build-linux
 
-# DOAR manual. Fara push, fara pull_request, fara branches.
+# Manual only. No push, no pull_request, no branches.
 "on":
   workflow_dispatch:
     inputs:
@@ -33,13 +33,13 @@ jobs:
   build:
     runs-on: ubuntu-24.04
     steps:
-      - name: Checkout (cu tags)
+      - name: Checkout (with tags)
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           fetch-tags: true
 
-      - name: Deps sistem (README Debian)
+      - name: System deps (README Debian)
         run: |
           sudo apt-get update
           sudo apt-get install -y python3-pyelftools python3-requests git cmake ninja-build \
@@ -47,7 +47,7 @@ jobs:
           gcc --version | head -n 1
           cmake --version | head -n 1
 
-      - name: Tag incremental automat (patch+1)
+      - name: Auto incremental tag (patch+1)
         id: tag
         run: |
           git fetch --tags --force
@@ -75,21 +75,21 @@ jobs:
           os_name = os.environ["TARGET_OS"]
           arch = os.environ["TARGET_ARCH"]
           info = DartLibInfo(ver, os_name, arch)
-          fetch_and_build(info)  # no-op daca lib exista deja
+          fetch_and_build(info)  # no-op if lib already exists
           inp = BlutterInput("", info, "out", True, False, False)
           cmake_blutter(inp)
-          assert os.path.isfile(inp.blutter_file), "lipsa binar: " + inp.blutter_file
-          print("BINAR:", inp.blutter_file)
+          assert os.path.isfile(inp.blutter_file), "missing binary: " + inp.blutter_file
+          print("BINARY:", inp.blutter_file)
           PY
         env:
           DART_VERSION: ${{ inputs.dart_version }}
           TARGET_OS: ${{ inputs.target_os }}
           TARGET_ARCH: ${{ inputs.target_arch }}
 
-      - name: Pack tar.gz (bin + runtime, fara dartsdk/build)
+      - name: Pack tar.gz (bin + runtime, no dartsdk/build)
         run: |
           BIN=$(ls bin/blutter_dartvm${{ inputs.dart_version }}_${{ inputs.target_os }}_${{ inputs.target_arch }}* | head -n 1)
-          echo "binar: $BIN"
+          echo "binary: $BIN"
           mkdir -p dist stage
           cp blutter.py dartvm_fetch_build.py extract_dart_info.py LICENSE README.md stage/
           cp -r scripts stage/
@@ -102,7 +102,7 @@ jobs:
           tar -czf "dist/${NAME}.tar.gz" -C stage .
           ls -la dist/
 
-      - name: Tag + GitHub Release (atasat tar.gz, fara upload-artifact)
+      - name: Tag + GitHub Release (attached tar.gz, no upload-artifact)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -111,4 +111,4 @@ jobs:
           git push origin "$TAG"
           gh release create "$TAG" dist/*.tar.gz \
             --title "blutter linux $TAG (dart ${{ inputs.dart_version }} ${{ inputs.target_os }} ${{ inputs.target_arch }})" \
-            --notes "Build Linux x64 automat (manual dispatch). Dart ${{ inputs.dart_version }} / ${{ inputs.target_os }} / ${{ inputs.target_arch }}. Despacheteaza tar.gz si ruleaza: python3 blutter.py <dir-cu-libapp+libflutter> <out>"
+            --notes "Automated Linux x64 build (manual dispatch). Dart ${{ inputs.dart_version }} / ${{ inputs.target_os }} / ${{ inputs.target_arch }}. Unpack the tar.gz and run: python3 blutter.py <dir-with-libapp+libflutter> <out>"
