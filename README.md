@@ -8,7 +8,7 @@ Also the application is currently work only against recent Dart versions.
 ## Environment Setup
 This application uses C++20 Formatting library. It requires very recent C++ compiler such as g++>=13, Clang>=16.
 
-I recommend using Linux OS (only tested on Deiban sid/trixie) because it is easy to setup.
+I recommend using Linux OS because it is easy to setup
 
 ## Usage
 Extract "lib" directory from apk file
